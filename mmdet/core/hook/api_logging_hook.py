@@ -4,7 +4,7 @@ from mmcv.runner.hooks import HOOKS, Hook
 
 
 @HOOKS.register_module()
-class CheckInvalidLossHook(Hook):
+class ApiLoggingHook(Hook):
     """Loggs the results to the enpoint specified in the env variable 
 
     Args:
