@@ -5,6 +5,7 @@ import os
 import os.path as osp
 import time
 import warnings
+import requests
 
 import mmcv
 import torch
@@ -242,6 +243,18 @@ def main():
         timestamp=timestamp,
         meta=meta)
 
+    endpoint = os.getenv(key='ENDPOINT')
+    uid = os.getenv(key='UID')
+
+    if endpoint and uid:
+        import requests
+        requests.get(url=f'{endpoint}/training_finished', params={'uid': uid})
+
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as e:
+        if endpoint and uid:
+            import requests
+            requests.get(url=f'{endpoint}/training_failed', params={'uid': uid})
