@@ -1,16 +1,13 @@
-_base_ = '../retinanet/retinanet_r50_fpn_1x_coco.py'
-
+# The new config inherits a base config to highlight the necessary modification
+_base_ = '../faster_rcnn/faster_rcnn_r50_fpn_1x_coco.py'
 
 # Change the number of classes
 model = dict(
-    bbox_head=dict(num_classes=1)
+    roi_head=dict(
+        #mask_head=dict(type='FCNMaskHead', num_classes=1),
+        bbox_head=dict(num_classes=1)
+    )
 )
-# model = dict(
-#     roi_head=dict(
-#         #mask_head=dict(type='FCNMaskHead', num_classes=1),
-#         bbox_head=dict(num_classes=1)
-#     )
-# )
 
 # Modify dataset related settings
 dataset_type = 'COCODataset'
@@ -41,3 +38,5 @@ data = dict(
 )
 
 work_dir = '/data/output'
+
+custom_hooks = [dict(type='ApiLoggingHook', interval=1)]

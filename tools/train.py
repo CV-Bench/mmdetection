@@ -244,17 +244,19 @@ def main():
         meta=meta)
 
     endpoint = os.getenv(key='ENDPOINT')
-    uid = os.getenv(key='UID')
+    id = os.getenv(key='ID')
 
-    if endpoint and uid:
-        import requests
-        requests.get(url=f'{endpoint}/training_finished', params={'uid': uid})
+    if endpoint and id:
+        import requests                      
+        requests.post(f'{endpoint}/finished', json = {'taskid': id})
 
 
 if __name__ == '__main__':
     try:
         main()
     except Exception as e:
-        if endpoint and uid:
-            import requests
-            requests.get(url=f'{endpoint}/training_failed', params={'uid': uid})
+        endpoint = os.getenv(key='ENDPOINT')
+        id = os.getenv(key='ID')
+        if endpoint and id:
+            import requests            
+            requests.post(f'{endpoint}/stop', json = {'taskid': id})
