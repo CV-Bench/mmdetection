@@ -22,7 +22,7 @@ metainfo = {
 
 data = dict(
     workers_per_gpu=0,
-    samples_per_gpu=8,
+    samples_per_gpu=4,
     train=dict(
         img_prefix='/data/input/train/',
         classes=classes,

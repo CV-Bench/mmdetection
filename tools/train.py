@@ -248,7 +248,7 @@ def main():
 
     if endpoint and id:
         import requests                      
-        requests.post(f'{endpoint}/finished', json = {'taskid': id})
+        requests.post(f'{endpoint}/finished', json = {'taskId': id})
 
 
 if __name__ == '__main__':
@@ -259,4 +259,6 @@ if __name__ == '__main__':
         id = os.getenv(key='ID')
         if endpoint and id:
             import requests            
-            requests.post(f'{endpoint}/stop', json = {'taskid': id})
+            requests.post(f'{endpoint}/stop', json = {'taskId': id})
+        
+        print(e)
