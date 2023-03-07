@@ -18,15 +18,23 @@ metainfo = {
     ]
 }
 
+train_dataset = dict(
+    dataset=dict(
+        img_prefix='/data/input/train/',
+        ann_file='/data/input/train/annotation_coco.json',
+        classes=classes,
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True)
+        ],
+        filter_empty_gt=False,
+    ),
+)
 
 data = dict(
     workers_per_gpu=0,
     samples_per_gpu=16,
-    train=dict(
-        img_prefix='/data/input/train/',
-        classes=classes,
-        ann_file='/data/input/train/annotation_coco.json',
-    ),
+    train=train_dataset,
     val=dict(
         img_prefix='/data/input/val/',
         classes=classes,
