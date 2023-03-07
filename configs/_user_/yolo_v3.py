@@ -50,7 +50,7 @@ test_pipeline = [
 
 data = dict(
     workers_per_gpu=0,
-    samples_per_gpu=4,
+    samples_per_gpu=16,
     train=dict(
         img_prefix='/data/input/train/',
         classes=classes,
@@ -71,3 +71,6 @@ data = dict(
 work_dir = '/data/output'
 
 optimizer = dict(type='SGD', lr=0.001, momentum=0.9, weight_decay=0.0005)
+grad_clip=dict(max_norm=35, norm_type=2)
+
+runner = dict(type='EpochBasedRunner', max_epochs=12)

@@ -49,7 +49,7 @@ test_pipeline = [
 
 data = dict(
     workers_per_gpu=0,
-    samples_per_gpu=4,
+    samples_per_gpu=16,
     train=dict(
         img_prefix='/data/input/train/',
         classes=classes,
