@@ -22,7 +22,7 @@ metainfo = {
 
 data = dict(
     workers_per_gpu=0,
-    samples_per_gpu=1,
+    samples_per_gpu=8,
     train=dict(
         img_prefix='/data/input/train/',
         classes=classes,
@@ -38,5 +38,3 @@ data = dict(
 )
 
 work_dir = '/data/output'
-
-custom_hooks = [dict(type='ApiLoggingHook', interval=1)]

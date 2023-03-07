@@ -1,12 +1,13 @@
-_base_ = '../retinanet/retinanet_r50_fpn_1x_coco.py'
+_base_ = '../yolo/yolov3_d53_mstrain-608_273e_coco.py'
 
-
-# Change the number of classes
+# model settings
 model = dict(
-    bbox_head=dict(num_classes=1)
+    bbox_head=dict(
+        num_classes=1,
+    )
 )
 
-# Modify dataset related settings
+# dataset settings
 dataset_type = 'COCODataset'
 classes = ('object',)
 
@@ -19,7 +20,7 @@ metainfo = {
 
 data = dict(
     workers_per_gpu=0,
-    samples_per_gpu=1,
+    samples_per_gpu=8,
     train=dict(
         img_prefix='/data/input/train/',
         classes=classes,
@@ -34,4 +35,8 @@ data = dict(
         ann_file='/data/input/val/annotation_coco.json'),
 )
 
+
 work_dir = '/data/output'
+
+
+optimizer = dict(type='SGD', lr=0.0001, momentum=0.9, weight_decay=0.0005)
