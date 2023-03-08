@@ -32,8 +32,8 @@ train_dataset = dict(
 )
 
 data = dict(
-    workers_per_gpu=0,
-    samples_per_gpu=16,
+    workers_per_gpu=1,
+    samples_per_gpu=4,
     train=train_dataset,
     val=dict(
         img_prefix='/data/input/val/',
@@ -54,3 +54,4 @@ optimizer = dict(type='SGD', lr=0.001, momentum=0.9, weight_decay=0.0005)
 grad_clip=dict(max_norm=35, norm_type=2)
 
 runner = dict(type='EpochBasedRunner', max_epochs=12)
+evaluation = dict(interval=1, metric='bbox')
