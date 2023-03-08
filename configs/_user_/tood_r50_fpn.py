@@ -1,4 +1,4 @@
-_base_ = '../todo/tood_r50_fpn_1x_coco.py'
+_base_ = '../tood/tood_r50_fpn_1x_coco.py'
 
 
 # Change the number of classes
