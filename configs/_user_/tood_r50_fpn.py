@@ -1,13 +1,12 @@
-_base_ = '../yolo/yolov3_d53_mstrain-608_273e_coco.py'
+_base_ = '../todo/tood_r50_fpn_1x_coco.py'
 
-# model settings
+
+# Change the number of classes
 model = dict(
-    bbox_head=dict(
-        num_classes=1,
-    )
+    bbox_head=dict(num_classes=1)
 )
 
-# dataset settings
+# Modify dataset related settings
 dataset_type = 'COCODataset'
 classes = ('object',)
 
@@ -17,6 +16,8 @@ metainfo = {
         (220, 20, 60),
     ]
 }
+
+# Data Pipeline setting - the are the same as in the original config, but with a smaller image size
 
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
@@ -48,9 +49,10 @@ test_pipeline = [
         ])
 ]
 
+# Data Paths
 data = dict(
     workers_per_gpu=0,
-    samples_per_gpu=8,
+    samples_per_gpu=16,
     train=dict(
         img_prefix='/data/input/train/',
         classes=classes,
@@ -73,7 +75,4 @@ work_dir = '/data/output'
 optimizer = dict(type='SGD', lr=0.001, momentum=0.9, weight_decay=0.0005)
 grad_clip=dict(max_norm=35, norm_type=2)
 
-runner = dict(type='EpochBasedRunner', max_epochs=12)
-
-
-load_from = '/checkpoints/yolo_v3.pth'
+#load_from = '/checkpoints/retinanet_r50_fpn.pth'
