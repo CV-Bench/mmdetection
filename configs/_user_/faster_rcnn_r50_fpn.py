@@ -71,3 +71,6 @@ data = dict(
 )
 
 work_dir = '/data/output'
+
+
+load_from = '/checkpoints/faster_rcnn_r50_fpn.pth'

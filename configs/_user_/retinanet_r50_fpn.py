@@ -71,3 +71,6 @@ work_dir = '/data/output'
 
 optimizer = dict(type='SGD', lr=0.001, momentum=0.9, weight_decay=0.0005)
 grad_clip=dict(max_norm=35, norm_type=2)
+
+
+load_from = '/checkpoints/retinanet_r50_fpn.pth'

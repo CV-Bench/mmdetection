@@ -55,3 +55,5 @@ grad_clip=dict(max_norm=35, norm_type=2)
 
 runner = dict(type='EpochBasedRunner', max_epochs=12)
 evaluation = dict(interval=1, metric='bbox')
+
+load_from = '/checkpoints/yolo_x.pth'
