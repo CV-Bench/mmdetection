@@ -220,8 +220,7 @@ def main():
     # dump config
     cfg.dump(osp.join(cfg.work_dir, osp.basename(args.config)))
     # init the logger before other steps
-    timestamp = time.strftime('%Y%m%d_%H%M%S', time.localtime())
-    log_file = osp.join(cfg.work_dir, f'{timestamp}.log')
+    log_file = osp.join(cfg.work_dir, '../log/output.log')
     logger = get_root_logger(log_file=log_file, log_level=cfg.log_level)
 
     # init the meta dict to record some important information such as
@@ -280,7 +279,7 @@ def main():
         cfg,
         distributed=distributed,
         validate=(not args.no_validate),
-        timestamp=timestamp,
+        timestamp='../log/output',
         meta=meta)
 
     generate_images(args)
