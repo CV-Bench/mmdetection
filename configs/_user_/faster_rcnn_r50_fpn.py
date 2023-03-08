@@ -71,6 +71,7 @@ data = dict(
 )
 
 work_dir = '/data/output'
+runner = dict(type='EpochBasedRunner', max_epochs=5)
 
 
 load_from = '/checkpoints/faster_rcnn_r50_fpn.pth'

@@ -6,6 +6,7 @@ import os.path as osp
 import time
 import warnings
 import requests
+import glob
 
 import mmcv
 import torch
@@ -15,7 +16,7 @@ from mmcv.runner import get_dist_info, init_dist
 from mmcv.utils import get_git_hash
 
 from mmdet import __version__
-from mmdet.apis import init_random_seed, set_random_seed, train_detector
+from mmdet.apis import init_random_seed, set_random_seed, train_detector, inference_detector, show_result_pyplot
 from mmdet.datasets import build_dataset
 from mmdet.models import build_detector
 from mmdet.utils import (collect_env, get_device, get_root_logger,
@@ -245,6 +246,11 @@ def main():
 
     endpoint = os.getenv(key='ENDPOINT')
     id = os.getenv(key='ID')
+
+    files = glob.glob('/data/input/val/images/*')[:10]
+        
+    for i, img in enumerate(files):
+        show_result_pyplot(model, img, out_file=f'/data/output/prediction-{i}.png')
 
     if endpoint and id:
         import requests                      
