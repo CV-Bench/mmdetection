@@ -7,6 +7,7 @@ import time
 import warnings
 import requests
 import glob
+import cv2
 
 import mmcv
 import torch
@@ -16,7 +17,7 @@ from mmcv.runner import get_dist_info, init_dist
 from mmcv.utils import get_git_hash
 
 from mmdet import __version__
-from mmdet.apis import init_random_seed, set_random_seed, train_detector, inference_detector, show_result_pyplot
+from mmdet.apis import init_random_seed, set_random_seed, train_detector, inference_detector, show_result_pyplot, init_detector
 from mmdet.datasets import build_dataset
 from mmdet.models import build_detector
 from mmdet.utils import (collect_env, get_device, get_root_logger,
@@ -106,7 +107,45 @@ def parse_args():
 
     return args
 
+def generate_images(args):
+    config_file = args.config
+    checkpoint_file = '/data/output/latest.pth'
+    model = init_detector(config_file, checkpoint_file, device='cuda:0')
+    
+    files = glob.glob('/data/input/val/images/*')[:10]
+        
+    for i, img in enumerate(files):
+        result = inference_detector(model, img)
+        show_result_pyplot(model, img, result, out_file=f'/data/output/prediction-{i}.png')
+        
+def send_images():
+    endpoint = os.getenv(key='ENDPOINT')
+    id = os.getenv(key='ID')
 
+    if endpoint and id:
+        import requests                      
+        requests.post(f'{endpoint}/task/finish', json = {'taskId': id})
+    
+    preview_width = 480
+    preview_height = 360
+    preview_ext = ".jpg"
+    preview_MIME = "image/jpg"
+    
+    for i in range(10):
+        img = cv2.imread(f'/data/output/prediction-{i}.png')
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        resized_img = cv2.resize(img, (preview_width, preview_height), cv2.INTER_AREA)
+        encoded_img = cv2.imencode(preview_ext, resized_img)[1]
+        load = f"data:{preview_MIME};base64,{encoded_img}"
+        
+        requests.post(
+            f'{endpoint}/networkPreview',
+            json={
+                'taskId': id,
+                'image': load
+            }
+        )
+    
 def main():
     args = parse_args()
 
@@ -244,17 +283,14 @@ def main():
         timestamp=timestamp,
         meta=meta)
 
+    generate_images(args)
+
     endpoint = os.getenv(key='ENDPOINT')
     id = os.getenv(key='ID')
 
-    files = glob.glob('/data/input/val/images/*')[:10]
-        
-    for i, img in enumerate(files):
-        show_result_pyplot(model, img, out_file=f'/data/output/prediction-{i}.png')
-
     if endpoint and id:
         import requests                      
-        requests.post(f'{endpoint}/finished', json = {'taskId': id})
+        requests.post(f'{endpoint}/task/finish', json = {'taskId': id})
 
 
 if __name__ == '__main__':
@@ -265,6 +301,6 @@ if __name__ == '__main__':
         id = os.getenv(key='ID')
         if endpoint and id:
             import requests            
-            requests.post(f'{endpoint}/stop', json = {'taskId': id})
+            requests.post(f'{endpoint}/task/stop', json = {'taskId': id})
         
         print(e)

@@ -75,3 +75,15 @@ runner = dict(type='EpochBasedRunner', max_epochs=5)
 
 
 load_from = '/checkpoints/faster_rcnn_r50_fpn.pth'
+
+# log_config = dict(
+#     hooks = [
+#     dict(type='MMDetWandbHook',
+#          init_kwargs={'project': 'mmdetection'},
+#          interval=1,
+#          log_checkpoint=False,
+#          log_checkpoint_metadata=True,
+#          num_eval_images=100,
+#          bbox_score_thr=0.3)
+#         ]
+# )
