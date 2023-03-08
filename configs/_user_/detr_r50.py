@@ -1,9 +1,11 @@
-_base_ = '../retinanet/retinanet_r50_fpn_1x_coco.py'
+_base_ = '../detr/detr_r50_8x2_150e_coco.py'
 
 
 # Change the number of classes
-model = dict(
-    bbox_head=dict(num_classes=1)
+model = dict(    
+    bbox_head=dict(
+        num_classes=80,
+    )
 )
 
 # Modify dataset related settings
@@ -72,4 +74,4 @@ work_dir = '/data/output'
 optimizer = dict(type='SGD', lr=0.001, momentum=0.9, weight_decay=0.0005)
 grad_clip=dict(max_norm=35, norm_type=2)
 
-load_from = '/checkpoints/retinanet_r50_fpn.pth'
+load_from = '/checkpoints/detr_r50.pth'
