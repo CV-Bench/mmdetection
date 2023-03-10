@@ -8,6 +8,7 @@ import warnings
 import requests
 import glob
 import cv2
+import base64
 
 import mmcv
 import torch
@@ -122,10 +123,6 @@ def send_images():
     endpoint = os.getenv(key='ENDPOINT')
     id = os.getenv(key='ID')
 
-    if endpoint and id:
-        import requests                      
-        requests.post(f'{endpoint}/task/finish', json = {'taskId': id})
-    
     preview_width = 480
     preview_height = 360
     preview_ext = ".jpg"
@@ -136,7 +133,9 @@ def send_images():
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         resized_img = cv2.resize(img, (preview_width, preview_height), cv2.INTER_AREA)
         encoded_img = cv2.imencode(preview_ext, resized_img)[1]
-        load = f"data:{preview_MIME};base64,{encoded_img}"
+        base64_img = base64.b64encode(encoded_img).decode("utf-8")
+         
+        load = f"data:{preview_MIME};base64,{base64_img}"
         
         requests.post(
             f'{endpoint}/networkPreview',
@@ -283,6 +282,7 @@ def main():
         meta=meta)
 
     generate_images(args)
+    send_images()
 
     endpoint = os.getenv(key='ENDPOINT')
     id = os.getenv(key='ID')
