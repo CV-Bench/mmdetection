@@ -138,7 +138,6 @@ def send_images(out_files):
     # send the images to the server
     for out_file in out_files:
         img = cv2.imread(out_file)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         resized_img = cv2.resize(img, (preview_width, preview_height), cv2.INTER_AREA)
         encoded_img = cv2.imencode(preview_ext, resized_img)[1]
         base64_img = base64.b64encode(encoded_img).decode("utf-8")
