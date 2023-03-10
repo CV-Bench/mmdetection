@@ -114,22 +114,30 @@ def generate_images(args):
     model = init_detector(config_file, checkpoint_file, device='cuda:0')
     
     files = glob.glob('/data/input/val/images/*')[:10]
-        
+    out_files = []
+    
+    # generate the images
     for i, img in enumerate(files):
+        out_file = f'/data/output/prediction-{i}.png'
         result = inference_detector(model, img)
-        show_result_pyplot(model, img, result, out_file=f'/data/output/prediction-{i}.png')
+        show_result_pyplot(model, img, result, out_file=out_file)
+        out_files.append(out_file)
         
-def send_images():
-    endpoint = os.getenv(key='ENDPOINT')
-    id = os.getenv(key='ID')
-
+    return out_files
+        
+def send_images(out_files):
+    # server endpoint settings
     preview_width = 480
     preview_height = 360
     preview_ext = ".jpg"
     preview_MIME = "image/jpg"
     
-    for i in range(10):
-        img = cv2.imread(f'/data/output/prediction-{i}.png')
+    endpoint = os.getenv(key='ENDPOINT')
+    id = os.getenv(key='ID')
+    
+    # send the images to the server
+    for out_file in out_files:
+        img = cv2.imread(out_file)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         resized_img = cv2.resize(img, (preview_width, preview_height), cv2.INTER_AREA)
         encoded_img = cv2.imencode(preview_ext, resized_img)[1]
@@ -142,8 +150,9 @@ def send_images():
             json={
                 'taskId': id,
                 'image': load
-            }
-        )
+            })
+            
+
     
 def main():
     args = parse_args()
@@ -281,8 +290,8 @@ def main():
         timestamp='../log/output',
         meta=meta)
 
-    generate_images(args)
-    send_images()
+    out_files = generate_images(args)
+    send_images(out_files)
 
     endpoint = os.getenv(key='ENDPOINT')
     id = os.getenv(key='ID')
