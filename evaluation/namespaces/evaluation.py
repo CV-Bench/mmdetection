@@ -22,40 +22,53 @@ class EvaluationNamespace(socketio.AsyncClientNamespace):
         print("Namespace /evaluation disconnected.")
         # logger.warning("Namespace /evaluation disconnected.")
 
+    # Runs evaluation
+    # Params:
+    # - request_data:   Dictionary with the following values 
+    # ["image", "network_id", "user_id", "evaluation_id", "preview"]
+    # "image" is a base64 encoded image
+    # "preview" is a boolean that decides if the bounding boxes image should be sent back to web app.
 
     def on_evaluate(self, request_data):
-        encoded_image = request_data["image"]
+      try:
         network_id = request_data["network_id"]
         # TODO: Implement caching system so that only one model can be loaded in cache per user. Use user_id for that
         user_id = request_data["user_id"]
         evaluation_id = request_data["evaluation_id"]
-        
+
         if self.network_is_loaded(network_id):
             self.loaded_networks[network_id]["last_used"] = datetime.now()
         else:
-            self.load_network(network_id)
+            self.load_network_to_cache(network_id)
 
-        results = self.run_evaluation(network_id, encoded_image)
-        
+        results = self.run_evaluation(request_data)
         # self.send_results(evaluation_id, results)
-
-        return {"evaluation_id": evaluation_id, "results": results}
+        return {"evaluation_id": evaluation_id, "results": results, "error": False, "error_msg": ""}
+      
+      except Exception as e:
+          return {"evaluation_id": evaluation_id, "results": {}, "error": True, "error_msg": e}
+        
+        
 
 
     def network_is_loaded(self, network_id):
       return network_id in self.loaded_networks.keys()
     
     
-    def load_network(self, network_id):
-      checkpoint_path = get_checkpoint_path(network_id)
-      config_path = get_config_path(network_id)
+    def load_network_to_cache(self, network_id):
+      try:
+        checkpoint_path = get_checkpoint_path(network_id)
+        config_path = get_config_path(network_id)
+        
+        self.loaded_networks[network_id] = {
+            "model": load_model(config_path, checkpoint_path),
+            "last_used": datetime.now()
+        }
 
-      self.loaded_networks[network_id] = {
-          "model": init_detector(config_path, checkpoint_path),
-          "last_used": datetime.now()
-      }
-
-
+      except Exception as e:
+         raise Exception("Could not load the network to the cache.") from e
+      
+      
     def clear_unused_from_cache(self):
        now = datetime.now()
        for network_id in self.loaded_networks.keys():
@@ -74,22 +87,29 @@ class EvaluationNamespace(socketio.AsyncClientNamespace):
         }
       )
 
+    def run_evaluation(self, request_data):
+      try:
+        network_id = request_data["network_id"]
+        encoded_image = request_data["image"]
+        preview = request_data["preview"]
 
-    def run_evaluation(self, network_id, image_encoded):
-      model = self.loaded_networks[network_id]["model"]
+        model = self.loaded_networks[network_id]["model"]
 
-      image_path = save_image(image_encoded)
+        image_path = save_image(encoded_image)
+        
+        results = run_inference(model, image_path)
+
+        encoded_bb_img = ""
+
+        if preview:
+          encoded_bb_img = get_preview_image(model, image_path, results)
+
+        delete_file(image_path)
+
+        annotations = parse_evaluation_results(network_id, results)
+
+        return {"image": encoded_bb_img, "annotations": annotations}
       
-      results = inference_detector(model, image_path)
-
-      bb_image_path = f"/data/images/{uuid.uuid4()}.png"
-      model.show_result(image_path, results, out_file=bb_image_path)
-      
-      encoded_bb_img = encode_image(bb_image_path)
-
-      delete_file(bb_image_path)
-      delete_file(image_path)
-
-      annotations = parse_evaluation_results(network_id, results)
-
-      return {"image": encoded_bb_img, "annotations": annotations}
+      except Exception as e:
+        raise Exception("Could not run evaluation correctly.") from e  
+    
