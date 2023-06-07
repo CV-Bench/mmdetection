@@ -11,14 +11,16 @@ async def main():
     eval_namespace = EvaluationNamespace("/evaluation")
     sio.register_namespace(eval_namespace)
 
+    print(config["SOCKET_DOMAIN_EVALUATION"])
+
     await sio.connect(
-        config["SOCKET_DOMAIN"], 
+        config["SOCKET_DOMAIN_EVALUATION"], 
         headers={
             "serverid": config["SERVER_ID"]
+        },
+        auth={ 
+            config["AUTH_TOKEN_KEY"]: config["AUTH_TOKEN"] 
         }
-        # auth={ 
-        #     config["AUTH_TOKEN_KEY"]: config["AUTH_TOKEN"] 
-        # }
     )
 
     task1 = asyncio.create_task(
