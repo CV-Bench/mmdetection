@@ -1,0 +1,5 @@
+CHECKPOINTS_PATH = "/data/nn-checkpoints"
+CONFIGS_PATH = "/data/nn-configs"
+CATEGORIES_PATH = "/data/nn-categories"
+IMAGES_PATH = "/data/images"
+OUTPUT_PATH = "/data/output"
