@@ -26,7 +26,7 @@ RUN pip install aiohttp
 # Install MMDetection
 RUN conda clean --all
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
-RUN git clone --branch inference-docker https://github.com/CV-Bench/mmdetection.git /mmdetection
+RUN git clone --branch evaluation-docker https://github.com/CV-Bench/mmdetection.git /mmdetection
 WORKDIR /mmdetection
 ENV FORCE_CUDA="1"
 RUN pip install --no-cache-dir -r requirements/build.txt
