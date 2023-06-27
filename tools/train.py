@@ -9,6 +9,7 @@ import requests
 import glob
 import cv2
 import base64
+import json
 
 import mmcv
 import torch
@@ -151,7 +152,16 @@ def send_images(out_files):
                 'image': load
             })
             
+def generate_categories_json():
+    with open("/data/input/annotation_coco.json") as f:
+        data = json.load(f)
 
+        categories_dict = {}
+        for cat in data["categories"]:
+            categories_dict[str(cat["id"])] = cat["name"]
+        
+        with open('/data/output/categories.json') as cat_f:
+            json.dump(categories_dict, cat_f)
     
 def main():
     args = parse_args()
@@ -288,6 +298,8 @@ def main():
         validate=(not args.no_validate),
         timestamp='../log/output',
         meta=meta)
+
+    generate_categories_json()
 
     out_files = generate_images(args)
     send_images(out_files)
