@@ -160,7 +160,7 @@ def generate_categories_json():
         for cat in data["categories"]:
             categories_dict[str(cat["id"])] = cat["name"]
         
-        with open('/data/output/categories.json') as cat_f:
+        with open("/data/output/categories.json", "w") as cat_f:
             json.dump(categories_dict, cat_f)
     
 def main():
