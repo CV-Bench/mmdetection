@@ -153,7 +153,7 @@ def send_images(out_files):
             })
             
 def generate_categories_json():
-    with open("/data/input/annotation_coco.json") as f:
+    with open("/data/input/train/annotation_coco.json") as f:
         data = json.load(f)
 
         categories_dict = {}
@@ -164,6 +164,8 @@ def generate_categories_json():
             json.dump(categories_dict, cat_f)
     
 def main():
+    generate_categories_json()
+
     args = parse_args()
 
     cfg = Config.fromfile(args.config)
@@ -298,8 +300,6 @@ def main():
         validate=(not args.no_validate),
         timestamp='../log/output',
         meta=meta)
-
-    generate_categories_json()
 
     out_files = generate_images(args)
     send_images(out_files)
