@@ -250,12 +250,22 @@ def train_detector(model,
 
     resume_from = None
     if cfg.resume_from is None and cfg.get('auto_resume'):
+        print("find_latest_checkpoint")
+        print(cfg.work_dir)
         resume_from = find_latest_checkpoint(cfg.work_dir)
     if resume_from is not None:
         cfg.resume_from = resume_from
-
+    
+    print(cfg.resume_from)
+    print(cfg.load_from)
+    print(cfg.workflow)
     if cfg.resume_from:
+        print("runner.resume")
         runner.resume(cfg.resume_from)
     elif cfg.load_from:
+        print("runner.load_checkpoint")
         runner.load_checkpoint(cfg.load_from)
+
+
+    print("runner.run")
     runner.run(data_loaders, cfg.workflow)
