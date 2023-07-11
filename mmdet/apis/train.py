@@ -268,4 +268,6 @@ def train_detector(model,
 
 
     print("runner.run")
+    print(data_loaders)
     runner.run(data_loaders, cfg.workflow)
+    print("FINISHED")
