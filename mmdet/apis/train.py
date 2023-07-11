@@ -122,9 +122,7 @@ def train_detector(model,
                    timestamp=None,
                    meta=None):
 
-    print("compat_cfg")
     cfg = compat_cfg(cfg)
-    print("get_root_logger")
     logger = get_root_logger(log_level=cfg.log_level)
 
     # prepare data loaders
@@ -148,7 +146,6 @@ def train_detector(model,
         **cfg.data.get('train_dataloader', {})
     }
 
-    print("build_dataloader")
     data_loaders = [build_dataloader(ds, **train_loader_cfg) for ds in dataset]
 
     # put model on gpus
@@ -156,7 +153,6 @@ def train_detector(model,
         find_unused_parameters = cfg.get('find_unused_parameters', False)
         # Sets the `find_unused_parameters` parameter in
         # torch.nn.parallel.DistributedDataParallel
-        print("build_ddp")
         model = build_ddp(
             model,
             cfg.device,
@@ -164,16 +160,12 @@ def train_detector(model,
             broadcast_buffers=False,
             find_unused_parameters=find_unused_parameters)
     else:
-        print("build_dp")
         model = build_dp(model, cfg.device, device_ids=cfg.gpu_ids)
 
-    print("auto_scale_lr")
     # build optimizer
     auto_scale_lr(cfg, distributed, logger)
-    print("build_optimizer")
     optimizer = build_optimizer(model, cfg.optimizer)
 
-    print("build_runner")
     runner = build_runner(
         cfg.runner,
         default_args=dict(
@@ -198,7 +190,6 @@ def train_detector(model,
     else:
         optimizer_config = cfg.optimizer_config
 
-    print("register_training_hooks")
     # register hooks
     runner.register_training_hooks(
         cfg.lr_config,
@@ -208,12 +199,10 @@ def train_detector(model,
         cfg.get('momentum_config', None),
         custom_hooks_config=cfg.get('custom_hooks', None))
 
-    print("if distributed")
     if distributed:
         if isinstance(runner, EpochBasedRunner):
             runner.register_hook(DistSamplerSeedHook())
 
-    print("if validate")
     # register eval hooks
     if validate:
         val_dataloader_default_args = dict(
@@ -233,41 +222,25 @@ def train_detector(model,
             # Replace 'ImageToTensor' to 'DefaultFormatBundle'
             cfg.data.val.pipeline = replace_ImageToTensor(
                 cfg.data.val.pipeline)
-            
-        print("build_dataset")
         val_dataset = build_dataset(cfg.data.val, dict(test_mode=True))
 
-        print("build_dataloader")
         val_dataloader = build_dataloader(val_dataset, **val_dataloader_args)
         eval_cfg = cfg.get('evaluation', {})
         eval_cfg['by_epoch'] = cfg.runner['type'] != 'IterBasedRunner'
         eval_hook = DistEvalHook if distributed else EvalHook
         # In this PR (https://github.com/open-mmlab/mmcv/pull/1193), the
         # priority of IterTimerHook has been modified from 'NORMAL' to 'LOW'.
-        print("register_hook")
         runner.register_hook(
             eval_hook(val_dataloader, **eval_cfg), priority='LOW')
 
     resume_from = None
     if cfg.resume_from is None and cfg.get('auto_resume'):
-        print("find_latest_checkpoint")
-        print(cfg.work_dir)
         resume_from = find_latest_checkpoint(cfg.work_dir)
     if resume_from is not None:
         cfg.resume_from = resume_from
-    
-    print(cfg.resume_from)
-    print(cfg.load_from)
-    print(cfg.workflow)
+
     if cfg.resume_from:
-        print("runner.resume")
         runner.resume(cfg.resume_from)
     elif cfg.load_from:
-        print("runner.load_checkpoint")
         runner.load_checkpoint(cfg.load_from)
-
-
-    print("runner.run")
-    print(data_loaders)
     runner.run(data_loaders, cfg.workflow)
-    print("FINISHED")
