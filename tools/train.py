@@ -114,7 +114,7 @@ def generate_images(args):
     checkpoint_file = '/data/output/latest.pth'
     model = init_detector(config_file, checkpoint_file, device='cuda:0')
     
-    files = glob.glob('/data/input/val/images/*')[:10]
+    files = glob.glob('/data/input/val/images/*.png')[:10]
     out_files = []
     
     # generate the images
@@ -308,6 +308,7 @@ def main():
 
     print("generate_images")
     out_files = generate_images(args)
+    print("send_images")
     send_images(out_files)
 
     print("getenv")
