@@ -268,15 +268,18 @@ def main():
     meta['seed'] = seed
     meta['exp_name'] = osp.basename(args.config)
 
+    print("build_detector")
     model = build_detector(
         cfg.model,
         train_cfg=cfg.get('train_cfg'),
         test_cfg=cfg.get('test_cfg'))
     model.init_weights()
 
+    print("rfnext_init_model")
     # init rfnext if 'RFSearchHook' is defined in cfg
     rfnext_init_model(model, cfg=cfg)
 
+    print("build_dataset")
     datasets = [build_dataset(cfg.data.train)]
     if len(cfg.workflow) == 2:
         assert 'val' in [mode for (mode, _) in cfg.workflow]
@@ -292,6 +295,8 @@ def main():
             CLASSES=datasets[0].CLASSES)
     # add an attribute for visualization convenience
     model.CLASSES = datasets[0].CLASSES
+
+    print("train_detector")
     train_detector(
         model,
         datasets,
@@ -301,12 +306,17 @@ def main():
         timestamp='../log/output',
         meta=meta)
 
+    print("generate_images")
     out_files = generate_images(args)
     send_images(out_files)
 
+    print("getenv")
     endpoint = os.getenv(key='ENDPOINT')
     id = os.getenv(key='ID')
+    print(endpoint)
+    print(id)
 
+    print("request.post")
     if endpoint and id:
         import requests                      
         requests.post(f'{endpoint}/task/finish', json = {'taskId': id})
