@@ -2,9 +2,7 @@ _base_ = '../yolo/yolov3_d53_mstrain-608_273e_coco.py'
 
 # model settings
 model = dict(
-    bbox_head=dict(
-        num_classes=1,
-    )
+    bbox_head=dict(num_classes=1,)
 )
 
 # dataset settings
@@ -75,4 +73,4 @@ grad_clip=dict(max_norm=35, norm_type=2)
 
 runner = dict(type='EpochBasedRunner', max_epochs=5)
 
-load_from = '/checkpoints/yolo_v3.pth'
+# load_from = '/checkpoints/yolo_v3.pth'
