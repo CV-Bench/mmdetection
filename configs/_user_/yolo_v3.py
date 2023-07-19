@@ -23,11 +23,37 @@ model = dict(
 
 
 metainfo = {
-    'CLASSES': classes,
-    'PALETTE': [
+    'classes': classes,
+    'palette': [
         (220, 20, 60),
     ]
 }
+# val_coco = '/data/input/val/annotation_coco.json'
+# train_coco = '/data/input/train/annotation_coco.json'
+
+# def preprocess(val):
+#     with open(val) as f:
+#         val = json.load(f)        
+
+#     classes = tuple((cat["name"] for cat in val["categories"]))
+#     return classes
+
+# # dataset settings
+# dataset_type = 'COCODataset'
+# classes = preprocess(val=val_coco)
+
+# # model settings
+# model = dict(
+#     bbox_head=dict(num_classes=len(classes),)
+# )
+
+
+# metainfo = {
+#     'CLASSES': classes,
+#     'PALETTE': [
+#         (220, 20, 60),
+#     ]
+# }
 
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
