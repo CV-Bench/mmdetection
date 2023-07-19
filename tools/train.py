@@ -110,7 +110,7 @@ def parse_args():
 
 def generate_images(args):
     config_file = args.config
-    checkpoint_file = '/data/output/latest.pth'
+    checkpoint_file = './data/output/latest.pth'
     model = init_detector(config_file, checkpoint_file, device='cuda:0')
     
     files = glob.glob('/data/input/val/images/*')[:10]
@@ -227,6 +227,7 @@ def main():
     # dump config
     cfg.dump(osp.join(cfg.work_dir, osp.basename(args.config)))
     # init the logger before other steps
+    os.makedirs(osp.join(cfg.work_dir, '../log/'), exist_ok=True)
     log_file = osp.join(cfg.work_dir, '../log/output.log')
     logger = get_root_logger(log_file=log_file, log_level=cfg.log_level)
 
