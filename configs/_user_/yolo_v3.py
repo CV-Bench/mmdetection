@@ -1,16 +1,29 @@
+import json
+
 _base_ = '../yolo/yolov3_d53_mstrain-608_273e_coco.py'
 
-# model settings
-model = dict(
-    bbox_head=dict(num_classes=1,)
-)
+val_coco = '/data/input/val/annotation_coco.json'
+train_coco = '/data/input/train/annotation_coco.json'
+
+def preprocess(val):
+    with open(val) as f:
+        val = json.load(f)
+
+    classes = tuple((cat["name"] for cat in val["categories"]))
+    return classes
 
 # dataset settings
 dataset_type = 'COCODataset'
-classes = ('object',)
+classes = preprocess(val=val_coco)
+
+# model settings
+model = dict(
+    bbox_head=dict(num_classes=len(classes),)
+)
+
 
 metainfo = {
-    'CLASSES': ('object', ),
+    'CLASSES': classes,
     'PALETTE': [
         (220, 20, 60),
     ]
@@ -52,17 +65,17 @@ data = dict(
     train=dict(
         img_prefix='/data/input/train/',
         classes=classes,
-        ann_file='/data/input/train/annotation_coco.json',
+        ann_file=train_coco,
         pipeline=train_pipeline),
     val=dict(
         img_prefix='/data/input/val/',
         classes=classes,
-        ann_file='/data/input/val/annotation_coco.json',
+        ann_file=val_coco,
         pipeline=test_pipeline),
     test=dict(
         img_prefix='/data/input/val/',
         classes=classes,
-        ann_file='/data/input/val/annotation_coco.json',
+        ann_file=val_coco,
         pipeline=test_pipeline)
 )
 
@@ -73,4 +86,4 @@ grad_clip=dict(max_norm=35, norm_type=2)
 
 runner = dict(type='EpochBasedRunner', max_epochs=5)
 
-# load_from = '/checkpoints/yolo_v3.pth'
+load_from = '/checkpoints/yolo_v3.pth'
