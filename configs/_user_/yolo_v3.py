@@ -1,11 +1,12 @@
-_base_ = '../yolo/yolov3_d53_mstrain-608_273e_coco.py'
-
 import json
 
-val_coco = './data/input/val/annotation_coco.json'
-train_coco = './data/input/train/annotation_coco.json'
+_base_ = '../yolo/yolov3_d53_mstrain-608_273e_coco.py'
+
+val_coco = '/mmdetection/data/input/val/annotation_coco.json'
+train_coco = '/mmdetection/data/input/train/annotation_coco.json'
 
 def preprocess(val):
+    return tuple("TEST")
     with open(val) as f:
         val = json.load(f)
 
@@ -66,27 +67,27 @@ data = dict(
     workers_per_gpu=0,
     samples_per_gpu=8,
     train=dict(
-        img_prefix='./data/input/train/',
+        img_prefix='/mmdetection/data/input/train/',
         classes=classes,
         ann_file=train_coco,
         pipeline=train_pipeline),
     val=dict(
-        img_prefix='./data/input/val/',
+        img_prefix='/mmdetection/data/input/val/',
         classes=classes,
         ann_file=val_coco,
         pipeline=test_pipeline),
     test=dict(
-        img_prefix='./data/input/val/',
+        img_prefix='/mmdetection/data/input/val/',
         classes=classes,
         ann_file=val_coco,
         pipeline=test_pipeline)
 )
 
-work_dir = './data/output'
+work_dir = '/mmdetection/data/output'
 
 optimizer = dict(type='SGD', lr=0.001, momentum=0.9, weight_decay=0.0005)
 grad_clip=dict(max_norm=35, norm_type=2)
 
 runner = dict(type='EpochBasedRunner', max_epochs=5)
 
-load_from = './yolov3_mobilenetv2_320_300e_coco_20210719_215349-d18dff72.pth'
+load_from = '../yolo/yolov3_d53_mstrain-608_273e_coco.pth'

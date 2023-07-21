@@ -22,8 +22,17 @@ RUN pip install --no-cache-dir mmcv-full==1.3.17 -f https://download.openmmlab.c
 
 # Install MMDetection
 RUN conda clean --all
+
 RUN git clone https://github.com/open-mmlab/mmdetection.git /mmdetection
+# overwrite with own repo
+# ADD . /mmdetection
+# link with -v instead
+
 WORKDIR /mmdetection
 ENV FORCE_CUDA="1"
+
 RUN pip install --no-cache-dir -r requirements/build.txt
 RUN pip install --no-cache-dir -e .
+
+# RUN mim download mmdet --config yolov3_d53_mstrain-608_273e_coco --dest /mmdetection/configs/yolo
+# RUN rm -r  /mmdetection/configs
